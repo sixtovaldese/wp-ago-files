@@ -1,0 +1,352 @@
+/* aGo Files Admin Styles */
+
+/* Layout (shared .ago-* pattern) */
+.ago-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+.ago-main {
+    flex: 1;
+    max-width: 780px;
+}
+
+.ago-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 960px) {
+    .ago-layout { flex-direction: column; }
+    .ago-sidebar { width: 100%; max-width: 780px; }
+}
+
+.ago-card {
+    max-width: 100% !important;
+}
+
+/* Sections */
+.ago-section {
+    margin: 20px 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.ago-section:last-of-type {
+    border-bottom: none;
+}
+
+.ago-section h3 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: #1d2327;
+}
+
+/* Toggle rows */
+.ago-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    margin: 4px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.15s;
+}
+
+.ago-toggle-row:hover {
+    background: #f0f6fc;
+}
+
+.ago-toggle-label {
+    flex: 1;
+}
+
+.ago-toggle-desc {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+}
+
+/* Switch (iOS-style toggle) */
+.ago-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.ago-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ago-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #c3c4c7;
+    border-radius: 24px;
+    transition: 0.3s;
+}
+
+.ago-slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.ago-switch input:checked + .ago-slider {
+    background: #2271b1;
+}
+
+.ago-switch input:checked + .ago-slider::before {
+    transform: translateX(20px);
+}
+
+/* Actions */
+.ago-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+}
+
+/* Folder create form */
+.ago-folder-create {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.ago-folder-create input[type="text"] {
+    flex: 1;
+    min-width: 180px;
+}
+
+.ago-folder-create select {
+    min-width: 140px;
+}
+
+/* Folder tree in admin */
+.ago-folder-tree-admin {
+    margin: 0;
+}
+
+.ago-folder-tree-admin .ago-admin-folder-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin: 2px 0;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: background 0.15s;
+}
+
+.ago-folder-tree-admin .ago-admin-folder-item:hover {
+    background: #f0f6fc;
+}
+
+.ago-folder-tree-admin .ago-admin-folder-icon {
+    color: #d4a017;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.ago-folder-tree-admin .ago-admin-folder-name {
+    flex: 1;
+    font-weight: 500;
+    color: #1d2327;
+}
+
+.ago-folder-tree-admin .ago-admin-folder-count {
+    font-size: 11px;
+    color: #999;
+    margin-right: 8px;
+}
+
+.ago-folder-tree-admin .ago-admin-folder-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.ago-folder-tree-admin .ago-admin-folder-item:hover .ago-admin-folder-actions {
+    opacity: 1;
+}
+
+.ago-folder-tree-admin .ago-admin-folder-actions button {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.15s;
+}
+
+.ago-folder-tree-admin .ago-admin-folder-actions button:hover {
+    background: #2271b1;
+    color: #fff;
+    border-color: #2271b1;
+}
+
+.ago-folder-tree-admin .ago-admin-folder-actions button.ago-delete-btn:hover {
+    background: #d63638;
+    border-color: #d63638;
+}
+
+/* Rename inline input */
+.ago-folder-tree-admin .ago-rename-input {
+    flex: 1;
+    font-size: 13px;
+    padding: 2px 6px;
+    border: 1px solid #2271b1;
+    border-radius: 3px;
+    outline: none;
+}
+
+/* Status message */
+#ago-files-status {
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+#ago-files-status.success {
+    background: #edfaef;
+    border: 1px solid #00a32a;
+    color: #00601b;
+}
+
+#ago-files-status.error {
+    background: #fcf0f1;
+    border: 1px solid #d63638;
+    color: #8a1114;
+}
+
+/* Features list */
+.ago-features {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+}
+
+.ago-features li {
+    font-size: 13px;
+    padding: 3px 0;
+    color: #555;
+}
+
+.ago-features li::before {
+    content: "\2713";
+    color: #00a32a;
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+/* Donation */
+.ago-donation {
+    text-align: center;
+}
+
+.ago-donation-amounts {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 12px 0;
+}
+
+.ago-amount {
+    display: inline-block;
+    padding: 8px 18px;
+    background: #f0f0f1;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    color: #1d2327;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.ago-amount:hover {
+    background: #2271b1;
+    color: #fff;
+    border-color: #2271b1;
+}
+
+.ago-coffee-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    background: #1d2327;
+    color: #fff !important;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s;
+    margin: 8px 0;
+}
+
+.ago-coffee-btn:hover {
+    background: #2271b1;
+    color: #fff !important;
+}
+
+.ago-donation-note {
+    font-size: 11px;
+    color: #999;
+    margin-top: 8px;
+}
+
+/* Footer */
+.ago-footer {
+    text-align: center;
+    padding: 16px 0;
+}
+
+.ago-footer-logo {
+    display: inline-block;
+    margin-bottom: 8px;
+    transition: opacity 0.2s;
+}
+
+.ago-footer-logo:hover {
+    opacity: 0.8;
+}
+
+.ago-footer p {
+    font-size: 13px;
+    color: #666;
+    margin: 4px 0;
+}
+
+.ago-footer a {
+    color: #2271b1;
+    text-decoration: none;
+}
