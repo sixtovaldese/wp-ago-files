@@ -10,15 +10,14 @@ class Page {
         ?>
         <div class="wrap">
             <h1>
-                <img src="<?php echo esc_url( AGO_FILES_URL . 'assets/img/agolab.webp' ); ?>" alt="aGo Lab" style="height:28px;width:auto;vertical-align:middle;margin-right:8px">
+                <img src="<?php echo esc_url( AGOFILES_URL . 'assets/img/agolab.webp' ); ?>" alt="aGo Lab" style="height:28px;width:auto;vertical-align:middle;margin-right:8px">
                 <?php esc_html_e( 'aGo Files', 'ago-files' ); ?>
-                <span style="font-size:12px;color:#999;margin-left:8px">v<?php echo esc_html( AGO_FILES_VERSION ); ?></span>
+                <span style="font-size:12px;color:#999;margin-left:8px">v<?php echo esc_html( AGOFILES_VERSION ); ?></span>
             </h1>
 
             <div class="ago-layout">
                 <div class="ago-main">
 
-                    <!-- Settings -->
                     <div class="card ago-card">
                         <h2><?php esc_html_e( 'Settings', 'ago-files' ); ?></h2>
                         <p><?php esc_html_e( 'Configure the media folder sidebar behavior. Changes are saved immediately.', 'ago-files' ); ?></p>
@@ -58,7 +57,6 @@ class Page {
                         </div>
                     </div>
 
-                    <!-- Folder Management -->
                     <div class="card ago-card">
                         <h2><?php esc_html_e( 'Folder Management', 'ago-files' ); ?></h2>
                         <p><?php esc_html_e( 'Create, rename, or delete media folders. You can also manage folders directly from the media library sidebar.', 'ago-files' ); ?></p>
@@ -84,10 +82,8 @@ class Page {
 
                 </div>
 
-                <!-- SIDEBAR -->
                 <div class="ago-sidebar">
 
-                    <!-- About -->
                     <div class="card ago-card">
                         <h3><?php esc_html_e( 'About', 'ago-files' ); ?></h3>
                         <p style="font-size:13px;color:#666">
@@ -102,9 +98,14 @@ class Page {
                             <li><?php esc_html_e( 'Uncategorized files filter', 'ago-files' ); ?></li>
                             <li><?php esc_html_e( 'REST API for all operations', 'ago-files' ); ?></li>
                         </ul>
+                        <p style="margin-top:12px">
+                            <a href="https://ago.cl/herramientas/wordpress/ago-files/docs" target="_blank" rel="noopener">
+                                <span class="dashicons dashicons-book" style="vertical-align:middle;margin-right:4px"></span>
+                                <?php esc_html_e( 'Documentation', 'ago-files' ); ?>
+                            </a>
+                        </p>
                     </div>
 
-                    <!-- Donation -->
                     <div class="card ago-card ago-donation">
                         <h3><?php esc_html_e( 'Support Open Source', 'ago-files' ); ?></h3>
                         <p style="font-size:13px;color:#666">
@@ -124,10 +125,9 @@ class Page {
                         </p>
                     </div>
 
-                    <!-- Footer with logo -->
                     <div class="ago-footer">
                         <a href="https://ago.cl" target="_blank" rel="noopener" class="ago-footer-logo">
-                            <img src="<?php echo esc_url( AGO_FILES_URL . 'assets/img/agolab.webp' ); ?>" alt="aGo Lab" style="height:40px;width:auto">
+                            <img src="<?php echo esc_url( AGOFILES_URL . 'assets/img/agolab.webp' ); ?>" alt="aGo Lab" style="height:40px;width:auto">
                         </a>
                         <p>
                             <?php

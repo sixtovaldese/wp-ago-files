@@ -1,16 +1,11 @@
-/**
- * aGo Files, Admin Settings Page JS
- */
 (function () {
     'use strict';
 
-    const cfg = window.agoFilesAdmin || {};
+    const cfg = window.agofilesAdmin || {};
     const API = cfg.restUrl || '';
     const NONCE = cfg.nonce || '';
     let settings = cfg.settings || {};
     let folders = cfg.folders || [];
-
-    /* ───── Helpers ───── */
 
     function api(endpoint, method, body) {
         const opts = {
@@ -32,8 +27,6 @@
         el.style.display = 'block';
         setTimeout(() => { el.style.display = 'none'; }, 3000);
     }
-
-    /* ───── Settings ───── */
 
     function initSettings() {
         document.querySelectorAll('.ago-switch input[data-key]').forEach(input => {
@@ -62,8 +55,6 @@
             }
         }).catch(() => showStatus('Error saving settings.', 'error'));
     }
-
-    /* ───── Folder Management ───── */
 
     function initFolderManagement() {
         renderFolderTree();
@@ -132,7 +123,6 @@
         const html = buildAdminFolderHTML(folders, 0);
         container.innerHTML = html;
 
-        // Bind events
         container.querySelectorAll('.ago-admin-rename').forEach(btn => {
             btn.addEventListener('click', e => {
                 e.stopPropagation();
@@ -246,8 +236,6 @@
         });
     }
 
-    /* ───── Utils ───── */
-
     function escHtml(str) {
         const div = document.createElement('div');
         div.textContent = str;
@@ -257,8 +245,6 @@
     function escAttr(str) {
         return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
-
-    /* ───── Init ───── */
 
     document.addEventListener('DOMContentLoaded', () => {
         initSettings();

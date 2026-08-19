@@ -20,21 +20,21 @@ class MediaLibrary {
         }
 
         wp_enqueue_style(
-            'ago-files-media',
-            AGO_FILES_URL . 'assets/css/media-library.css',
+            'agofiles-media',
+            AGOFILES_URL . 'assets/css/media-library.css',
             [],
-            AGO_FILES_VERSION
+            AGOFILES_VERSION
         );
 
         wp_enqueue_script(
-            'ago-files-media',
-            AGO_FILES_URL . 'assets/js/media-library.js',
+            'agofiles-media',
+            AGOFILES_URL . 'assets/js/media-library.js',
             [ 'jquery' ],
-            AGO_FILES_VERSION,
+            AGOFILES_VERSION,
             true
         );
 
-        wp_localize_script( 'ago-files-media', 'agoFiles', [
+        wp_localize_script( 'agofiles-media', 'agofilesData', [
             'restUrl'            => rest_url( 'ago-files/v1' ),
             'nonce'              => wp_create_nonce( 'wp_rest' ),
             'taxonomy'           => Taxonomy::TAXONOMY,
@@ -66,7 +66,8 @@ class MediaLibrary {
             return;
         }
 
-        $folder = $_GET['ago_folder'] ?? '';
+        // Read-only filter from a folder link in the media list; no state change, nonce not required.
+        $folder = isset( $_GET['agofiles_folder'] ) ? sanitize_text_field( wp_unslash( $_GET['agofiles_folder'] ) ) : '';
         if ( '' === $folder ) {
             return;
         }
@@ -89,7 +90,8 @@ class MediaLibrary {
      * Filter grid view (AJAX) by folder.
      */
     public static function filter_grid_by_folder( array $args ): array {
-        $folder = $_REQUEST['ago_folder'] ?? '';
+        // Read-only filter applied to the media grid query; no state change, nonce not required.
+        $folder = isset( $_REQUEST['agofiles_folder'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['agofiles_folder'] ) ) : '';
         if ( '' === $folder ) {
             return $args;
         }

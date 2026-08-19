@@ -22,8 +22,6 @@ class Plugin {
         add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 
-        register_activation_hook( AGO_FILES_FILE, [ $this, 'activate' ] );
-
         // Init media library hooks.
         MediaLibrary::init();
     }
@@ -31,29 +29,18 @@ class Plugin {
     /* ───── Textdomain ───── */
 
     public function load_textdomain(): void {
-        load_plugin_textdomain( 'ago-files', false, dirname( plugin_basename( AGO_FILES_FILE ) ) . '/languages' );
-    }
-
-    public function activate(): void {
-        // Register taxonomy so flush works.
-        Taxonomy::init();
-
-        if ( false === get_option( 'ago_files_settings' ) ) {
-            update_option( 'ago_files_settings', self::defaults() );
-        }
-
-        flush_rewrite_rules();
+        load_plugin_textdomain( 'ago-files', false, dirname( plugin_basename( AGOFILES_FILE ) ) . '/languages' );
     }
 
     /* ───── Admin menu (smart pattern) ───── */
 
     public function register_admin_menu(): void {
-        if ( empty( $GLOBALS['admin_page_hooks']['ago-tools'] ) ) {
+        if ( empty( $GLOBALS['admin_page_hooks']['agolab-tools'] ) ) {
             add_menu_page(
                 __( 'aGo Tools', 'ago-files' ),
                 __( 'aGo Tools', 'ago-files' ),
                 'manage_options',
-                'ago-tools',
+                'agolab-tools',
                 '__return_null',
                 'dashicons-hammer',
                 81
@@ -61,15 +48,15 @@ class Plugin {
         }
 
         add_submenu_page(
-            'ago-tools',
+            'agolab-tools',
             __( 'aGo Files', 'ago-files' ),
             __( 'Files', 'ago-files' ),
             'manage_options',
-            'ago-files',
+            'agofiles',
             [ Admin\Page::class, 'render' ]
         );
 
-        remove_submenu_page( 'ago-tools', 'ago-tools' );
+        remove_submenu_page( 'agolab-tools', 'agolab-tools' );
     }
 
     /* ───── REST routes ───── */
@@ -264,7 +251,7 @@ class Plugin {
         $settings['show_sidebar']      = isset( $input['show_sidebar'] ) ? (bool) $input['show_sidebar'] : $defaults['show_sidebar'];
         $settings['show_folder_column'] = isset( $input['show_folder_column'] ) ? (bool) $input['show_folder_column'] : $defaults['show_folder_column'];
 
-        update_option( 'ago_files_settings', $settings );
+        update_option( 'agofiles_settings', $settings );
 
         return new \WP_REST_Response( [ 'saved' => true, 'settings' => $settings ] );
     }
@@ -272,26 +259,26 @@ class Plugin {
     /* ───── Assets (settings page) ───── */
 
     public function enqueue_assets( string $hook ): void {
-        if ( ! str_ends_with( $hook, '_page_ago-files' ) ) {
+        if ( ! str_ends_with( $hook, '_page_agofiles' ) ) {
             return;
         }
 
         wp_enqueue_style(
-            'ago-files-admin',
-            AGO_FILES_URL . 'assets/css/admin.css',
+            'agofiles-admin',
+            AGOFILES_URL . 'assets/css/admin.css',
             [],
-            AGO_FILES_VERSION
+            AGOFILES_VERSION
         );
 
         wp_enqueue_script(
-            'ago-files-admin',
-            AGO_FILES_URL . 'assets/js/admin.js',
+            'agofiles-admin',
+            AGOFILES_URL . 'assets/js/admin.js',
             [],
-            AGO_FILES_VERSION,
+            AGOFILES_VERSION,
             true
         );
 
-        wp_localize_script( 'ago-files-admin', 'agoFilesAdmin', [
+        wp_localize_script( 'agofiles-admin', 'agofilesAdmin', [
             'restUrl'  => rest_url( 'ago-files/v1' ),
             'nonce'    => wp_create_nonce( 'wp_rest' ),
             'settings' => $this->get_settings(),
@@ -310,7 +297,7 @@ class Plugin {
 
     private function get_settings(): array {
         return wp_parse_args(
-            get_option( 'ago_files_settings', [] ),
+            get_option( 'agofiles_settings', [] ),
             self::defaults()
         );
     }

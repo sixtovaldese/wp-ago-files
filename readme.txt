@@ -1,9 +1,9 @@
 === aGo Files ===
-Contributors: sixtovaldese
+Contributors: agolab
 Donate link: https://paypal.me/sixtovaldes
 Tags: media library, folders, organization, taxonomy, file manager
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 8.1
 Stable tag: 1.0.0
 License: GPL-2.0-or-later
@@ -19,7 +19,7 @@ aGo Files organizes your media library into virtual folders. The files stay wher
 
 * Tree of folders in the Media Library sidebar.
 * Drag and drop attachments between folders.
-* Create, rename, delete and reorder folders.
+* Create, rename and delete folders.
 * Multi-select and bulk assign.
 * Filter by folder in the attachment picker.
 * Files on disk are not moved: works without breaking existing URLs.
@@ -45,10 +45,29 @@ It uses a different taxonomy, so it does not import their data. You can run them
 
 The taxonomy query is indexed. Tested with libraries above 10,000 attachments without noticeable lag.
 
+== Screenshots ==
+
+1. Folder sidebar in the Media Library with drag and drop.
+2. Folder management page: create, rename, delete and nest folders.
+3. Bulk move and folder filter in grid view.
+
+== External services ==
+
+This plugin does not connect to any external service. The donation links and the aGo Lab link in the admin page point to PayPal and ago.cl, opened only when the user clicks them.
+
+== Privacy ==
+
+The plugin stores a custom taxonomy (agofiles_media_folder) to group attachments, plus one option (agofiles_settings) with the sidebar preferences. It sends no data to third parties. On uninstall, all folder terms and the settings option are removed.
+
 == Changelog ==
 
 = 1.0.0 =
 * Initial release.
+* Virtual folder tree in the Media Library sidebar.
+* Drag and drop, bulk move and folder assignment.
+* Create, rename, delete and nest folders.
+* Filter media by folder in list and grid view.
+* REST API for all folder operations.
 
 == Upgrade Notice ==
 

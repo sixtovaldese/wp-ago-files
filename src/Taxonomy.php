@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || exit;
 
 class Taxonomy {
 
-    const TAXONOMY = 'ago_media_folder';
+    const TAXONOMY = 'agofiles_media_folder';
 
     public static function init(): void {
         register_taxonomy( self::TAXONOMY, 'attachment', [
@@ -62,19 +62,25 @@ class Taxonomy {
 
     public static function get_uncategorized_count(): int {
         global $wpdb;
-        $taxonomy = self::TAXONOMY;
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery
         return (int) $wpdb->get_var(
-            "SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p
-             LEFT JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
-             LEFT JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id AND tt.taxonomy = '{$taxonomy}'
-             WHERE p.post_type = 'attachment' AND p.post_status = 'inherit' AND tt.term_taxonomy_id IS NULL"
+            $wpdb->prepare(
+                "SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p
+                 LEFT JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+                 LEFT JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id AND tt.taxonomy = %s
+                 WHERE p.post_type = 'attachment' AND p.post_status = 'inherit' AND tt.term_taxonomy_id IS NULL",
+                self::TAXONOMY
+            )
         );
+        // phpcs:enable WordPress.DB.DirectDatabaseQuery
     }
 
     public static function get_total_count(): int {
         global $wpdb;
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery
         return (int) $wpdb->get_var(
             "SELECT COUNT(ID) FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_status = 'inherit'"
         );
+        // phpcs:enable WordPress.DB.DirectDatabaseQuery
     }
 }
