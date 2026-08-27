@@ -67,6 +67,7 @@ class MediaLibrary {
         }
 
         // Read-only filter from a folder link in the media list; no state change, nonce not required.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $folder = isset( $_GET['agofiles_folder'] ) ? sanitize_text_field( wp_unslash( $_GET['agofiles_folder'] ) ) : '';
         if ( '' === $folder ) {
             return;
@@ -91,17 +92,22 @@ class MediaLibrary {
      */
     public static function filter_grid_by_folder( array $args ): array {
         // Read-only filter applied to the media grid query; no state change, nonce not required.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $folder = isset( $_REQUEST['agofiles_folder'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['agofiles_folder'] ) ) : '';
         if ( '' === $folder ) {
             return $args;
         }
 
         if ( 'uncategorized' === $folder ) {
+            // Filtering by folder is what the plugin does, and it only runs on
+            // the media grid in the admin.
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
             $args['tax_query'] = [ [
                 'taxonomy' => Taxonomy::TAXONOMY,
                 'operator' => 'NOT EXISTS',
             ] ];
         } else {
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
             $args['tax_query'] = [ [
                 'taxonomy' => Taxonomy::TAXONOMY,
                 'field'    => 'term_id',

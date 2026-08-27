@@ -4,11 +4,13 @@
  * Plugin URI:  https://ago.cl/herramientas/
  * Description: Virtual folder organization for WordPress media library using a custom taxonomy. Lightweight alternative to HappyFiles/FileBird.
  * Version:     1.0.0
+ * Requires at least: 6.0
  * Requires PHP: 8.1
  * Author:      aGo Lab
  * Author URI:  https://ago.cl/
  * License:     GPL-2.0-or-later
  * Text Domain: ago-files
+ * Domain Path: /languages
  */
 
 defined( 'ABSPATH' ) || exit;

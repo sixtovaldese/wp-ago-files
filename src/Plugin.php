@@ -16,7 +16,6 @@ class Plugin {
     }
 
     private function __construct() {
-        add_action( 'init', [ $this, 'load_textdomain' ] );
         add_action( 'init', [ Taxonomy::class, 'init' ] );
         add_action( 'admin_menu', [ $this, 'register_admin_menu' ] );
         add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
@@ -24,12 +23,6 @@ class Plugin {
 
         // Init media library hooks.
         MediaLibrary::init();
-    }
-
-    /* ───── Textdomain ───── */
-
-    public function load_textdomain(): void {
-        load_plugin_textdomain( 'ago-files', false, dirname( plugin_basename( AGOFILES_FILE ) ) . '/languages' );
     }
 
     /* ───── Admin menu (smart pattern) ───── */
