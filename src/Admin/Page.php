@@ -20,7 +20,7 @@ class Page {
 
                     <div class="card ago-card">
                         <h2><?php esc_html_e( 'Settings', 'ago-files' ); ?></h2>
-                        <p><?php esc_html_e( 'Configure the media folder sidebar behavior. Changes are saved immediately.', 'ago-files' ); ?></p>
+                        <p><?php esc_html_e( 'Choose where the folders appear.', 'ago-files' ); ?></p>
 
                         <div id="ago-files-status" style="display:none"></div>
 
@@ -30,7 +30,7 @@ class Page {
                             <label class="ago-toggle-row">
                                 <span class="ago-toggle-label">
                                     <strong><?php esc_html_e( 'Show Folder Sidebar', 'ago-files' ); ?></strong>
-                                    <span class="ago-toggle-desc"><?php esc_html_e( 'Display the folder sidebar in the media library', 'ago-files' ); ?></span>
+                                    <span class="ago-toggle-desc"><?php esc_html_e( 'Show the folder tree in the Media Library and in the media picker of the editor', 'ago-files' ); ?></span>
                                 </span>
                                 <span class="ago-switch">
                                     <input type="checkbox" data-key="show_sidebar">
@@ -41,7 +41,7 @@ class Page {
                             <label class="ago-toggle-row">
                                 <span class="ago-toggle-label">
                                     <strong><?php esc_html_e( 'Show Folder Column', 'ago-files' ); ?></strong>
-                                    <span class="ago-toggle-desc"><?php esc_html_e( 'Show the folder column in the media list view', 'ago-files' ); ?></span>
+                                    <span class="ago-toggle-desc"><?php esc_html_e( 'Show a Folders column in the list view of the Media Library', 'ago-files' ); ?></span>
                                 </span>
                                 <span class="ago-switch">
                                     <input type="checkbox" data-key="show_folder_column">
@@ -85,25 +85,27 @@ class Page {
                 <div class="ago-sidebar">
 
                     <div class="card ago-card">
+                        <h3><?php esc_html_e( 'Quick links', 'ago-files' ); ?></h3>
+                        <ul class="ago-features" style="list-style:none;padding:0;margin:0">
+                            <li><a href="https://ago.cl/herramientas/wordpress/ago-files/docs" target="_blank" rel="noopener"><?php esc_html_e( 'Documentation', 'ago-files' ); ?></a></li>
+                            <li><a href="<?php echo esc_url( admin_url( 'upload.php' ) ); ?>"><?php esc_html_e( 'Open the Media Library', 'ago-files' ); ?></a></li>
+                            <li><a href="https://wordpress.org/documentation/article/media-library-screen/" target="_blank" rel="noopener"><?php esc_html_e( 'Media Library guide (WordPress.org)', 'ago-files' ); ?></a></li>
+                        </ul>
+                    </div>
+
+                    <div class="card ago-card">
                         <h3><?php esc_html_e( 'About', 'ago-files' ); ?></h3>
                         <p style="font-size:13px;color:#666">
-                            <?php esc_html_e( 'Virtual folder organization for your WordPress media library. Lightweight and fast.', 'ago-files' ); ?>
+                            <?php esc_html_e( 'Virtual folders for your Media Library. Files stay where they are on disk and keep their URLs.', 'ago-files' ); ?>
                         </p>
                         <ul class="ago-features">
                             <li><?php esc_html_e( 'Drag & drop files into folders', 'ago-files' ); ?></li>
                             <li><?php esc_html_e( 'Hierarchical subfolders', 'ago-files' ); ?></li>
                             <li><?php esc_html_e( 'Works in list and grid view', 'ago-files' ); ?></li>
                             <li><?php esc_html_e( 'Bulk move files', 'ago-files' ); ?></li>
-                            <li><?php esc_html_e( 'Right-click context menu', 'ago-files' ); ?></li>
                             <li><?php esc_html_e( 'Uncategorized files filter', 'ago-files' ); ?></li>
-                            <li><?php esc_html_e( 'REST API for all operations', 'ago-files' ); ?></li>
+                            <li><?php esc_html_e( 'Completely free, no Pro tier.', 'ago-files' ); ?></li>
                         </ul>
-                        <p style="margin-top:12px">
-                            <a href="https://ago.cl/herramientas/wordpress/ago-files/docs" target="_blank" rel="noopener">
-                                <span class="dashicons dashicons-book" style="vertical-align:middle;margin-right:4px"></span>
-                                <?php esc_html_e( 'Documentation', 'ago-files' ); ?>
-                            </a>
-                        </p>
                     </div>
 
                     <div class="card ago-card ago-donation">

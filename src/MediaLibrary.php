@@ -13,9 +13,13 @@ class MediaLibrary {
     }
 
     public static function enqueue_on_media_pages( string $hook ): void {
-        // Load on upload.php (media library) and post.php/post-new.php (media modal)
+        // The Media Library screen, and the editor screens where the media modal opens.
         $media_pages = [ 'upload.php', 'post.php', 'post-new.php' ];
         if ( ! in_array( $hook, $media_pages, true ) ) {
+            return;
+        }
+
+        if ( ! Plugin::settings()['show_sidebar'] || ! current_user_can( 'upload_files' ) ) {
             return;
         }
 
@@ -35,13 +39,14 @@ class MediaLibrary {
         );
 
         wp_localize_script( 'agofiles-media', 'agofilesData', [
-            'restUrl'            => rest_url( 'ago-files/v1' ),
+            'restUrl'            => rest_url( Plugin::REST_NAMESPACE ),
             'nonce'              => wp_create_nonce( 'wp_rest' ),
-            'taxonomy'           => Taxonomy::TAXONOMY,
             'folders'            => Taxonomy::get_folder_tree(),
             'uncategorizedCount' => Taxonomy::get_uncategorized_count(),
             'totalCount'         => Taxonomy::get_total_count(),
+            'canEditFolders'     => current_user_can( Taxonomy::cap( 'edit_terms' ) ),
             'i18n'               => [
+                'folders'       => __( 'Folders', 'ago-files' ),
                 'allFiles'      => __( 'All Files', 'ago-files' ),
                 'uncategorized' => __( 'Uncategorized', 'ago-files' ),
                 'newFolder'     => __( 'New Folder', 'ago-files' ),
@@ -50,11 +55,37 @@ class MediaLibrary {
                 'deleteConfirm' => __( 'Delete this folder? Files will not be deleted.', 'ago-files' ),
                 'moveTo'        => __( 'Move to folder', 'ago-files' ),
                 'folderName'    => __( 'Folder name', 'ago-files' ),
-                'noFiles'       => __( 'No files in this folder.', 'ago-files' ),
                 'createSub'     => __( 'Create Subfolder', 'ago-files' ),
-                'bulkMove'      => __( 'Move selected to...', 'ago-files' ),
+                'bulkMove'      => __( 'Move', 'ago-files' ),
+                'error'         => __( 'Something went wrong. Please try again.', 'ago-files' ),
             ],
         ] );
+    }
+
+    /**
+     * The folder chosen in the sidebar, or '' for all files. It only narrows
+     * the list the current user is already allowed to see.
+     */
+    private static function requested_folder( string $folder ): string {
+        if ( 'uncategorized' === $folder ) {
+            return $folder;
+        }
+        return absint( $folder ) ? (string) absint( $folder ) : '';
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    private static function tax_query( string $folder ): array {
+        if ( 'uncategorized' === $folder ) {
+            return [ [
+                'taxonomy' => Taxonomy::TAXONOMY,
+                'operator' => 'NOT EXISTS',
+            ] ];
+        }
+        return [ [
+            'taxonomy' => Taxonomy::TAXONOMY,
+            'field'    => 'term_id',
+            'terms'    => (int) $folder,
+        ] ];
     }
 
     /**
@@ -68,52 +99,32 @@ class MediaLibrary {
 
         // Read-only filter from a folder link in the media list; no state change, nonce not required.
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        $folder = isset( $_GET['agofiles_folder'] ) ? sanitize_text_field( wp_unslash( $_GET['agofiles_folder'] ) ) : '';
+        $raw    = isset( $_GET['agofiles_folder'] ) ? sanitize_text_field( wp_unslash( $_GET['agofiles_folder'] ) ) : '';
+        $folder = self::requested_folder( $raw );
         if ( '' === $folder ) {
             return;
         }
 
-        if ( 'uncategorized' === $folder ) {
-            $query->set( 'tax_query', [ [
-                'taxonomy' => Taxonomy::TAXONOMY,
-                'operator' => 'NOT EXISTS',
-            ] ] );
-        } else {
-            $query->set( 'tax_query', [ [
-                'taxonomy' => Taxonomy::TAXONOMY,
-                'field'    => 'term_id',
-                'terms'    => (int) $folder,
-            ] ] );
-        }
+        $query->set( 'tax_query', self::tax_query( $folder ) );
     }
 
     /**
-     * Filter grid view (AJAX) by folder.
+     * Filter grid view (AJAX) by folder. The media grid sends its parameters
+     * inside query[], which is where the folder comes from.
      */
     public static function filter_grid_by_folder( array $args ): array {
-        // Read-only filter applied to the media grid query; no state change, nonce not required.
+        // Read-only filter applied to the media grid query; core checks the request before this filter runs.
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        $folder = isset( $_REQUEST['agofiles_folder'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['agofiles_folder'] ) ) : '';
+        $raw    = isset( $_REQUEST['query']['agofiles_folder'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['query']['agofiles_folder'] ) ) : '';
+        $folder = self::requested_folder( $raw );
         if ( '' === $folder ) {
             return $args;
         }
 
-        if ( 'uncategorized' === $folder ) {
-            // Filtering by folder is what the plugin does, and it only runs on
-            // the media grid in the admin.
-            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-            $args['tax_query'] = [ [
-                'taxonomy' => Taxonomy::TAXONOMY,
-                'operator' => 'NOT EXISTS',
-            ] ];
-        } else {
-            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-            $args['tax_query'] = [ [
-                'taxonomy' => Taxonomy::TAXONOMY,
-                'field'    => 'term_id',
-                'terms'    => (int) $folder,
-            ] ];
-        }
+        // Filtering by folder is what the plugin does, and it only runs on
+        // the media grid in the admin.
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+        $args['tax_query'] = self::tax_query( $folder );
 
         return $args;
     }

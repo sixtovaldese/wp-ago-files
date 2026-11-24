@@ -4,9 +4,22 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 global $wpdb;
 
 /*
- * Folder terms are read straight from the tables: get_terms() needs the
- * taxonomy to be registered, and on uninstall the plugin is no longer loaded.
- * The query is parameterised and runs once, so caching it would serve nothing.
+ * On uninstall the plugin is not loaded, so its taxonomy is not registered and
+ * wp_delete_term() would refuse to delete the folders. A bare registration is
+ * enough for it to work; it lives only for this request.
+ */
+if ( ! taxonomy_exists( 'agofiles_media_folder' ) ) {
+    register_taxonomy( 'agofiles_media_folder', 'attachment', [
+        'hierarchical' => true,
+        'public'       => false,
+        'rewrite'      => false,
+    ] );
+}
+
+/*
+ * Folder terms are read straight from the tables so that every one is found,
+ * however deep it is nested. The query is parameterised and runs once, so
+ * caching it would serve nothing.
  */
 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 $agofiles_terms = $wpdb->get_col( $wpdb->prepare(

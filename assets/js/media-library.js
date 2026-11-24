@@ -4,7 +4,6 @@
     const CFG       = window.agofilesData || {};
     const API       = CFG.restUrl || '';
     const NONCE     = CFG.nonce || '';
-    const TAXONOMY  = CFG.taxonomy || 'agofiles_media_folder';
     const I18N      = CFG.i18n || {};
     let folders     = CFG.folders || [];
     let uncatCount  = CFG.uncategorizedCount || 0;
@@ -45,12 +44,12 @@
 
         const header = document.createElement('div');
         header.className = 'ago-files-sidebar-header';
-        header.textContent = 'Folders';
+        header.textContent = I18N.folders;
         sidebar.appendChild(header);
 
         sidebar.appendChild(buildFolderEl({
             id: '',
-            name: I18N.allFiles || 'All Files',
+            name: I18N.allFiles,
             count: totalCount,
             _icon: '\uD83D\uDCC1',
             _special: 'all',
@@ -58,7 +57,7 @@
 
         sidebar.appendChild(buildFolderEl({
             id: 'uncategorized',
-            name: I18N.uncategorized || 'Uncategorized',
+            name: I18N.uncategorized,
             count: uncatCount,
             _icon: '\uD83D\uDCC2',
             _special: 'uncategorized',
@@ -73,7 +72,7 @@
         const createRow = document.createElement('div');
         createRow.className = 'ago-files-new-folder';
         createRow.innerHTML =
-            '<input type="text" placeholder="' + esc(I18N.folderName || 'Folder name') + '">' +
+            '<input type="text" placeholder="' + esc(I18N.folderName) + '">' +
             '<button type="button">+</button>';
         sidebar.appendChild(createRow);
 
@@ -142,7 +141,7 @@
 
         el.addEventListener('click', () => selectFolder(String(f.id)));
 
-        if (!f._special) {
+        if (!f._special && CFG.canEditFolders) {
             el.addEventListener('contextmenu', e => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -200,9 +199,9 @@
 
             const url = new URL(window.location.href);
             if (folderId === '') {
-                url.searchParams.delete('ago_folder');
+                url.searchParams.delete('agofiles_folder');
             } else {
-                url.searchParams.set('ago_folder', folderId);
+                url.searchParams.set('agofiles_folder', folderId);
             }
             window.location.href = url.toString();
         } else {
@@ -220,9 +219,9 @@
 
         if (library) {
             if (folderId === '') {
-                library.props.unset('ago_folder');
+                library.props.unset('agofiles_folder');
             } else {
-                library.props.set('ago_folder', folderId);
+                library.props.set('agofiles_folder', folderId);
             }
             library.reset();
             library.props.set({ ignore: (+ new Date()) });
@@ -240,10 +239,10 @@
                 const view = content.get();
                 if (view && view.collection) {
                     if (folderId === '') {
-                        delete view.collection.props.attributes.ago_folder;
-                        view.collection.props.unset('ago_folder');
+                        delete view.collection.props.attributes.agofiles_folder;
+                        view.collection.props.unset('agofiles_folder');
                     } else {
-                        view.collection.props.set('ago_folder', folderId);
+                        view.collection.props.set('agofiles_folder', folderId);
                     }
                     view.collection.reset();
                     view.collection.props.set({ ignore: (+ new Date()) });
@@ -266,12 +265,12 @@
         contextMenu.className = 'ago-files-context-menu';
 
         const renameBtn = document.createElement('button');
-        renameBtn.textContent = I18N.rename || 'Rename';
+        renameBtn.textContent = I18N.rename;
         renameBtn.addEventListener('click', () => { closeContextMenu(); startInlineRename(el, folder); });
         contextMenu.appendChild(renameBtn);
 
         const subBtn = document.createElement('button');
-        subBtn.textContent = I18N.createSub || 'Create Subfolder';
+        subBtn.textContent = I18N.createSub;
         subBtn.addEventListener('click', () => { closeContextMenu(); startInlineSubfolder(el, folder); });
         contextMenu.appendChild(subBtn);
 
@@ -281,10 +280,10 @@
 
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'ago-ctx-delete';
-        deleteBtn.textContent = I18N.delete || 'Delete';
+        deleteBtn.textContent = I18N.delete;
         deleteBtn.addEventListener('click', () => {
             closeContextMenu();
-            if (confirm(I18N.deleteConfirm || 'Delete this folder? Files will not be deleted.')) {
+            if (confirm(I18N.deleteConfirm)) {
                 api('/folders/' + folder.id, 'DELETE').then(() => rebuildSidebars());
             }
         });
@@ -366,7 +365,7 @@
 
         const input = document.createElement('input');
         input.type = 'text';
-        input.placeholder = I18N.folderName || 'Folder name';
+        input.placeholder = I18N.folderName;
         row.appendChild(input);
         childWrap.insertBefore(row, childWrap.firstChild);
         input.focus();
@@ -395,8 +394,8 @@
         if (!name) return;
 
         api('/folders', 'POST', { name, parent: parent || 0 }).then(res => {
-            if (res.error) {
-                alert(res.error);
+            if (!res.id) {
+                alert(res.message || I18N.error);
                 return;
             }
             input.value = '';
@@ -467,22 +466,9 @@
         }
         if (!ids.length || folderId === '') return;
 
-        if (folderId === 'uncategorized') {
-
-            ids.forEach(id => {
-                $.ajax({
-                    url: API.replace('/ago-files/v1', '') + '/wp/v2/media/' + id,
-                    method: 'POST',
-                    headers: { 'X-WP-Nonce': NONCE },
-                    contentType: 'application/json',
-                    data: JSON.stringify({ ago_media_folder: [] }),
-                });
-            });
-            setTimeout(rebuildSidebars, 500);
-            return;
-        }
-
-        api('/move', 'POST', { attachment_ids: ids, folder_id: parseInt(folderId, 10) }).then(() => {
+        const target = folderId === 'uncategorized' ? 0 : parseInt(folderId, 10);
+        api('/move', 'POST', { attachment_ids: ids, folder_id: target }).then(res => {
+            if (!res.success) alert(res.message || I18N.error);
             rebuildSidebars();
 
             if (!isListView() && wp && wp.media && wp.media.frame) {
@@ -535,14 +521,14 @@
         wrap.style.display = 'inline-flex';
 
         const select = document.createElement('select');
-        select.innerHTML = '<option value="">' + esc(I18N.moveTo || 'Move to folder') + '</option>';
+        select.innerHTML = '<option value="">' + esc(I18N.moveTo) + '</option>';
         addFolderOptions(select, folders, 0);
         wrap.appendChild(select);
 
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'button';
-        btn.textContent = I18N.bulkMove || 'Move';
+        btn.textContent = I18N.bulkMove;
         btn.addEventListener('click', () => {
             const folderId = parseInt(select.value, 10);
             if (!folderId) return;
@@ -572,7 +558,7 @@
     }
 
     function injectListView() {
-        activeFolder = getUrlParam('ago_folder');
+        activeFolder = getUrlParam('agofiles_folder');
 
         const form = document.querySelector('#posts-filter') || document.querySelector('.wp-list-table.media');
         if (!form) return;
@@ -598,7 +584,7 @@
     }
 
     function injectGridView() {
-        activeFolder = getUrlParam('ago_folder');
+        activeFolder = getUrlParam('agofiles_folder');
 
         function tryInject() {
             const browser = document.querySelector('.media-frame-content .attachments-browser')
@@ -614,7 +600,7 @@
             try {
                 var sidebar = buildSidebar();
                 browser.insertBefore(sidebar, browser.firstChild);
-                browser.style.display = 'flex';
+                browser.classList.add('agofiles-has-sidebar');
 
                 initDragOnGridView();
                 hookMediaAjax();
@@ -648,9 +634,9 @@
             }
             if (options && options.data && options.data.query) {
                 if (activeFolder !== '') {
-                    options.data.query.ago_folder = activeFolder;
+                    options.data.query.agofiles_folder = activeFolder;
                 } else {
-                    delete options.data.query.ago_folder;
+                    delete options.data.query.agofiles_folder;
                 }
             }
             if (action) {
@@ -676,7 +662,7 @@
 
                 const sidebar = buildSidebar();
                 browser.insertBefore(sidebar, browser.firstChild);
-                browser.style.display = 'flex';
+                browser.classList.add('agofiles-has-sidebar');
 
                 initDragOnGridView();
                 hookMediaAjax();

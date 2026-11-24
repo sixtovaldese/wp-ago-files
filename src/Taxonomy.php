@@ -8,6 +8,19 @@ class Taxonomy {
 
     const TAXONOMY = 'agofiles_media_folder';
 
+    /**
+     * Capabilities of the folder taxonomy. Anyone who can upload files may
+     * create folders and file their own uploads; renaming and deleting a
+     * folder changes how the whole team finds its files, so it takes the same
+     * capability WordPress asks for to manage categories.
+     */
+    private const CAPS = [
+        'manage_terms' => 'upload_files',
+        'assign_terms' => 'upload_files',
+        'edit_terms'   => 'manage_categories',
+        'delete_terms' => 'manage_categories',
+    ];
+
     public static function init(): void {
         register_taxonomy( self::TAXONOMY, 'attachment', [
             'labels' => [
@@ -22,12 +35,22 @@ class Taxonomy {
             'hierarchical'          => true,
             'public'                => false,
             'show_ui'               => false,
-            'show_in_rest'          => true,
-            'show_admin_column'     => true,
+            // The plugin has its own routes; the core one would list folder names to anyone.
+            'show_in_rest'          => false,
+            'show_admin_column'     => (bool) Plugin::settings()['show_folder_column'],
             'query_var'             => false,
             'rewrite'               => false,
+            'capabilities'          => self::CAPS,
             'update_count_callback' => '_update_generic_term_count',
         ] );
+    }
+
+    public static function cap( string $action ): string {
+        return self::CAPS[ $action ];
+    }
+
+    public static function is_folder( int $term_id ): bool {
+        return $term_id > 0 && (bool) term_exists( $term_id, self::TAXONOMY );
     }
 
     public static function get_folder_tree(): array {
@@ -48,7 +71,8 @@ class Taxonomy {
             if ( (int) $term->parent === $parent ) {
                 $node = [
                     'id'       => $term->term_id,
-                    'name'     => $term->name,
+                    // WordPress stores "&" as "&amp;"; the scripts print names as text.
+                    'name'     => html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ),
                     'slug'     => $term->slug,
                     'count'    => (int) $term->count,
                     'parent'   => $parent,
@@ -65,10 +89,13 @@ class Taxonomy {
         // phpcs:disable WordPress.DB.DirectDatabaseQuery
         return (int) $wpdb->get_var(
             $wpdb->prepare(
-                "SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p
-                 LEFT JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
-                 LEFT JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id AND tt.taxonomy = %s
-                 WHERE p.post_type = 'attachment' AND p.post_status = 'inherit' AND tt.term_taxonomy_id IS NULL",
+                "SELECT COUNT(p.ID) FROM {$wpdb->posts} p
+                 WHERE p.post_type = 'attachment' AND p.post_status = 'inherit'
+                 AND NOT EXISTS (
+                     SELECT 1 FROM {$wpdb->term_relationships} tr
+                     INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                     WHERE tr.object_id = p.ID AND tt.taxonomy = %s
+                 )",
                 self::TAXONOMY
             )
         );

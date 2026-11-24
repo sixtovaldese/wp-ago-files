@@ -6,6 +6,7 @@
     const NONCE = cfg.nonce || '';
     let settings = cfg.settings || {};
     let folders = cfg.folders || [];
+    const T = cfg.i18n || {};
 
     function api(endpoint, method, body) {
         const opts = {
@@ -49,11 +50,11 @@
         api('/settings', 'POST', data).then(res => {
             if (res.saved) {
                 settings = res.settings;
-                showStatus('Settings saved.', 'success');
+                showStatus(T.saved, 'success');
             } else {
-                showStatus('Error saving settings.', 'error');
+                showStatus(T.saveError, 'error');
             }
-        }).catch(() => showStatus('Error saving settings.', 'error'));
+        }).catch(() => showStatus(T.saveError, 'error'));
     }
 
     function initFolderManagement() {
@@ -85,14 +86,14 @@
         }
 
         api('/folders', 'POST', { name, parent }).then(res => {
-            if (res.error) {
-                showStatus(res.error, 'error');
+            if (!res.id) {
+                showStatus(res.message || T.error, 'error');
                 return;
             }
             nameInput.value = '';
             refreshFolders();
-            showStatus('Folder created.', 'success');
-        }).catch(() => showStatus('Error creating folder.', 'error'));
+            showStatus(T.created, 'success');
+        }).catch(() => showStatus(T.error, 'error'));
     }
 
     function refreshFolders() {
@@ -135,13 +136,13 @@
                 e.stopPropagation();
                 const id = parseInt(btn.dataset.id, 10);
                 const name = btn.dataset.name;
-                if (confirm('Delete folder "' + name + '"? Files will not be deleted.')) {
+                if (confirm(T.deleteConfirm.replace('%s', name))) {
                     api('/folders/' + id, 'DELETE').then(res => {
                         if (res.success) {
                             refreshFolders();
-                            showStatus('Folder deleted.', 'success');
+                            showStatus(T.deleted, 'success');
                         } else {
-                            showStatus(res.error || 'Error.', 'error');
+                            showStatus(res.message || T.error, 'error');
                         }
                     });
                 }
@@ -158,8 +159,8 @@
             html += '<span class="ago-admin-folder-name">' + escHtml(f.name) + '</span>';
             html += '<span class="ago-admin-folder-count">(' + f.count + ')</span>';
             html += '<span class="ago-admin-folder-actions">';
-            html += '<button class="ago-admin-rename" data-id="' + f.id + '" data-name="' + escAttr(f.name) + '">Rename</button>';
-            html += '<button class="ago-admin-delete ago-delete-btn" data-id="' + f.id + '" data-name="' + escAttr(f.name) + '">Delete</button>';
+            html += '<button class="ago-admin-rename" data-id="' + f.id + '" data-name="' + escAttr(f.name) + '">' + escHtml(T.rename) + '</button>';
+            html += '<button class="ago-admin-delete ago-delete-btn" data-id="' + f.id + '" data-name="' + escAttr(f.name) + '">' + escHtml(T.delete) + '</button>';
             html += '</span>';
             html += '</div>';
             if (f.children && f.children.length) {
@@ -189,12 +190,12 @@
                 api('/folders/' + id, 'PUT', { name: newName }).then(res => {
                     if (res.success) {
                         refreshFolders();
-                        showStatus('Folder renamed.', 'success');
+                        showStatus(T.renamed, 'success');
                     } else {
-                        showStatus(res.error || 'Error.', 'error');
+                        showStatus(res.message || T.error, 'error');
                         revert();
                     }
-                }).catch(() => { showStatus('Error.', 'error'); revert(); });
+                }).catch(() => { showStatus(T.error, 'error'); revert(); });
             } else {
                 revert();
             }
@@ -219,7 +220,11 @@
         if (!select) return;
 
         const val = select.value;
-        select.innerHTML = '<option value="0">(No parent)</option>';
+        select.innerHTML = '';
+        const none = document.createElement('option');
+        none.value = '0';
+        none.textContent = T.noParent;
+        select.appendChild(none);
         addParentOptions(select, folders, 0);
         select.value = val;
     }

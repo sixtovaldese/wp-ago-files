@@ -1,7 +1,7 @@
 === aGo Files ===
 Contributors: agolab
 Donate link: https://paypal.me/sixtovaldes
-Tags: media library, folders, organization, taxonomy, file manager
+Tags: media library, folders, media folders, organize media, drag and drop
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.1
@@ -9,65 +9,83 @@ Stable tag: 1.0.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Virtual folders for the WordPress Media Library using a custom taxonomy. Lightweight alternative to HappyFiles and FileBird.
+Virtual folders for the Media Library that follow WordPress roles: authors file their own uploads, editors manage the shared folders.
 
 == Description ==
 
-aGo Files organizes your media library into virtual folders. The files stay where they are on disk: only a taxonomy is added so you can filter, move and assign attachments by folder from the Media screen.
+aGo Files adds a folder tree to the Media Library. The files stay where they are on disk and keep their URLs: a folder is a label stored in a private taxonomy, so you can filter, move and assign files by folder without breaking a single link.
+
+**Folders that follow WordPress roles**
+
+On a site with several people uploading, the folders are shared, but not everyone should be able to reorganize them.
+
+* Anyone who can upload files can create folders and file the uploads they are allowed to edit. An author can move their own images, not the images of a colleague.
+* Renaming or deleting a folder changes how the whole team finds its files, so it takes the same permission WordPress asks for to manage categories (editors and administrators by default).
+* A request that mixes a file the user may not edit with files they may edit changes nothing.
+* Folder names are not published through the public REST API.
 
 **Features**
 
-* Tree of folders in the Media Library sidebar.
-* Drag and drop attachments between folders.
-* Create, rename and delete folders.
-* Multi-select and bulk assign.
-* Filter by folder in the attachment picker.
-* Files on disk are not moved: works without breaking existing URLs.
-* No external services.
+* Folder tree in the Media Library, in list and grid view, and in the media picker of the editor.
+* Nested folders, created from the sidebar or from the settings screen.
+* Drag and drop one file or a whole selection onto a folder.
+* Bulk move from the list view.
+* "Uncategorized" filter for files that are not in any folder.
+* Rename, create subfolder and delete from a right-click menu.
+* Files on disk are never moved or renamed.
+* Uninstall removes every folder and the plugin settings, and leaves the files untouched.
+
+The plugin is completely free. There is no Pro version.
 
 == Installation ==
 
-1. Upload the `ago-files` folder to `/wp-content/plugins/` or install via the Plugins screen.
+1. Upload the `ago-files` folder to `/wp-content/plugins/`, or install it from the Plugins screen.
 2. Activate the plugin through the Plugins menu in WordPress.
-3. Open the Media Library. The folder sidebar appears on the left.
+3. Open Media > Library. The folder tree appears on the left.
+4. Optional: the settings screen is under aGo Tools > Files.
 
 == Frequently Asked Questions ==
 
 = Will it move my files on the server? =
 
-No. Files stay where they are. Folders are virtual.
+No. Files stay where they are and keep their URLs. Folders only exist in the Media Library.
 
-= Is it compatible with FileBird / HappyFiles? =
+= Who can create, rename or delete folders? =
 
-It uses a different taxonomy, so it does not import their data. You can run them side by side, but most users pick one.
+Users who can upload files can create folders and file the uploads they are allowed to edit. Renaming and deleting folders requires the manage_categories capability, which editors and administrators have by default.
 
-= Does it slow down the Media Library? =
+= What happens to the files when I delete a folder? =
 
-The taxonomy query is indexed. Tested with libraries above 10,000 attachments without noticeable lag.
+Nothing. The files stay in the Media Library and show up under "Uncategorized" if they were in no other folder.
+
+= Can a file be in more than one folder? =
+
+Yes. Dragging a file onto a folder moves it there; the plugin's REST route agofiles/v1/assign adds a folder while keeping the others.
+
+= Does it import folders from other folder plugins? =
+
+No. It starts with an empty tree.
 
 == Screenshots ==
 
-1. Folder sidebar in the Media Library with drag and drop.
-2. Folder management page: create, rename, delete and nest folders.
-3. Bulk move and folder filter in grid view.
+1. Folder tree in the Media Library grid view.
+2. Folder tree in the list view, with the Folders column and bulk move.
+3. Settings screen: where the folders appear and folder management.
 
 == External services ==
 
-This plugin does not connect to any external service. The donation links and the aGo Lab link in the admin page point to PayPal and ago.cl, opened only when the user clicks them.
+This plugin does not connect to or send data to any external service. Everything runs on your own WordPress installation.
+
+The settings screen links to external sites that only open when you click them: the aGo Lab website and documentation, the WordPress.org documentation and PayPal donation pages. No data is transmitted automatically.
 
 == Privacy ==
 
-The plugin stores a custom taxonomy (agofiles_media_folder) to group attachments, plus one option (agofiles_settings) with the sidebar preferences. It sends no data to third parties. On uninstall, all folder terms and the settings option are removed.
+The plugin stores the folders as terms of a private taxonomy (agofiles_media_folder) attached to the files of the Media Library, plus one option (agofiles_settings) with the two display settings. It stores no personal data and sends nothing to third parties. On uninstall, all folders and the settings option are removed; the files are not touched.
 
 == Changelog ==
 
 = 1.0.0 =
 * Initial release.
-* Virtual folder tree in the Media Library sidebar.
-* Drag and drop, bulk move and folder assignment.
-* Create, rename, delete and nest folders.
-* Filter media by folder in list and grid view.
-* REST API for all folder operations.
 
 == Upgrade Notice ==
 

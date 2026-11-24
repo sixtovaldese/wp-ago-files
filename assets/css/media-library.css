@@ -329,3 +329,34 @@ body.upload-php .ago-files-wrap .subsubsub {
     .ago-files-folder[data-depth="2"] { padding-left: 36px; }
     .ago-files-folder[data-depth="3"] { padding-left: 50px; }
 }
+
+/* The media picker positions its toolbar and items absolutely, and the grid of
+   the Media Library lets them flow; in both the folder tree takes a fixed column
+   on the left and the rest starts after it. */
+.attachments-browser.agofiles-has-sidebar,
+.media-frame.mode-grid .attachments-browser.agofiles-has-sidebar {
+    position: relative;
+    box-sizing: border-box;
+    padding-left: 232px;
+}
+
+.attachments-browser.agofiles-has-sidebar > .ago-files-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 220px;
+    max-height: none;
+}
+
+.media-modal .attachments-browser.agofiles-has-sidebar > .media-toolbar,
+.media-modal .attachments-browser.agofiles-has-sidebar:not(.has-load-more) .attachments,
+.media-modal .attachments-browser.agofiles-has-sidebar.has-load-more .attachments-wrapper,
+.media-modal .attachments-browser.agofiles-has-sidebar .uploader-inline {
+    left: 232px;
+}
+
+.media-frame.mode-grid .attachments-browser.agofiles-has-sidebar > .ago-files-sidebar {
+    bottom: auto;
+    min-height: 500px;
+}
